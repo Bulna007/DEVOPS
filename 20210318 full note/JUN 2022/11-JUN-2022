@@ -142,8 +142,6 @@ There are 2 ways we can use github in jenkins:
 1. throught gitpat token we can manage git projects in jenkins
 2. through git webhooks
 
-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
-
 build periodically -> jenkins build for every 10 minutes (cron expression)
 poll scm -> cron expression (10 minutes check whether change in the repo or not), if there is a newer commit
 --------------------------------------------------------------------------------------------
