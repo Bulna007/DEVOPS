@@ -1,0 +1,32 @@
+Q.) What is vagrant, what is the purpose of it?
+Ans: Vagrant is an virtualization workflow automation tool that helps in quickly provisioning the virtual machines on an underlying hypervisor platform.
+
+To setup an virtual machine we need to perform lot of activities like
+1. We need to install the hypervisor software on the workstations of each member(dev/qa) in the team.
+2. On one of the developer/devops engineer machine we need to setup the development environment by creating the virtual machine manually. In order to create the virtual machine manually we need to perform lot of steps as below:
+	2.1. Download the iso image of the relevant os we want to use for setting up the dev/qa env.
+	2.2. Create the virtual machine by using the respective hypervisor software with appropriate configuration like
+		a. cpu
+		b. ram
+		c. storage
+		d. networking mode (network adapter configuration)
+		e. shared folders
+3. Install the os on the vm we have created above
+4. Download the required software packages or libraries that are required to be installed aspart of the target env inorder to develop/run the software application.
+5. Install and configure these packages/libraries on the virtual machine environment.
+6. Export the virtual machine as an vdi disk image file and distriute it across all the members of the team
+
+Then the machine can be used by the developer or qa for developing/testing the application. The whole process described above should be repeated or followed by everyone in the team in setting up the virtual machine environment inorder to work on the project/application that has lot of drawbacks:
+1. Since everyone in the team has to go through the whole process of creating the virtual machine, it results in huge amount of wastage in time in creating the env.
+2. Debugging and troubleshooting the problems while setting up the env would leads to more wastage of time.
+
+To overcome the above problems in manually creating the virtual machines across all the members of team, we can export the virtual machine we have setup on one machine into an virtual machine image file and can transfer it to the other computers and import in quickly creating the virtual machine, thus saves lot of time and eliminates all the above problems.
+
+But using this technic of importing and creating an virtual machine also has lot of problems:
+1. Creating the VM manually is a laborious process and involves several steps that needs to be performed in a specific sequential order inorder to setup the virtual machine env, thus it takes huge amount of time.
+2. OS and software upgrades, patches released enforces us to recreate the virtual machine env from the scratch which involves huge amount of time in creating the vdi image files and redistrubuting.
+3. The process of setting up the vm is not one-time job, it is an repeatitive task/job that needs to be performed whenever there is a change in infra(OS) or software packages or tools and their versions, while setting up the vm there is always a chance of performing an human error that leads to incorrect environment and forces us to scrap and recreate the vm from scratch that results in huge amount of time waste.
+4. Not everyone in the team is aware of virtualization/hypervisor technology, they may not know the process of importing the vdi disk image files in creating the virtual machine locally on their workstation, thus making it difficult to adopt by the team.
+
+
+Even though using virtualization has many benefits, inorder to create the virtual machine and setup the required environment itself seems to be very challenging that makes using virtualization very complex. So to overcome these problems in creating the virtual machines we need sophisticated tools that helps us in creating the virtual machines quickly that is where vagrant comes into picture. 
