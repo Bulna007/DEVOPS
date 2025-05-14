@@ -25,8 +25,8 @@ Place these #2 website directories under /var/www location
 		|-quickeats
 		
 cd ~/var/www
-git clone https://techsriman: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@github.com/techsriman/sportsbar.git
-git clone https://techsriman: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@github.com/techsriman/quickeats.git
+git clone https://techsriman:@github.com/techsriman/sportsbar.git
+git clone https://techsriman:@github.com/techsriman/quickeats.git
 	
 3. Install apache2 server
 sudo apt update -y
