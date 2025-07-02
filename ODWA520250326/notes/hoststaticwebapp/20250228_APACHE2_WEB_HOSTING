@@ -40,8 +40,8 @@ sudo systemctl status apache2
 upon installing apache2 server on ubuntu operating system, it will be installed with default configurations placed under
 
 /etc/apache2
-		|-sites-available (virtualhost configuration files rae placed)
-	  |-sites-enabled
+		|-sites-available (virtualhost configuration files are placed)
+		|-sites-enabled
 		
 Now we want to host 2 websites for this we need to write #2 configuration files
 cd /etc/apache2/sites-available
@@ -170,109 +170,3 @@ if [ $ENABLE_SITE_STATUS -ne 0 ]; then
 	exit 400
 fi
 echo "$SITE_DIR enabled successfully"
-
-	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

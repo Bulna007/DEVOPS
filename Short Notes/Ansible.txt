@@ -1,0 +1,1137 @@
+Virtualization
+--------------
+Virtualization is technology through which we can create/setup multiple parallel isolated environments on one single machine.
+
+Vagrant
+-------
+Vagrant is a iac(infrastructure as code) automatio tool for setting up virtual machine infrastructure.
+
+Terraform
+---------
+Terraform is an iac(infrastructure as code) automation tool used for quickly creating cloud infrastructure resources.
+
+Why do we need Software configuration management tools?
+Vagrant is an virtualization workflow automation tool through which we can quickly provision the virtual machine infrastructure through code. Similary on a cloud platform to provision the Infrastructure we can use Terraform. Both Vagrant and Terrform are the iac (Infrastructure as Code) tools through which we can automate the process of creating the Infrastructure
+
+By just having the Infrastructure we cannot run our software applications, we need necessary software packages, libraries to be installed and apply configurations inorder to have the environment ready for deploying the applications.
+    
+How to install the software packages and apply the configurations on the infrastructure being provisioned?
+There are many ways we can install and configure the software packages ontop of the infrastructure
+
+#1. Manually install and configure
+The devops engineer upon provisioning the infrastructure should manually download, install and configure the required software packages , but this approach has several drawbacks/problems:
+1. Installing and configuring the software packages manually is time consuming process. In an organization environment there are fleet of computers on which the ops engineer has to manually install thse softwares and configure them takes huge amount of time 
+
+2. Memorizing all the software packages, their versions and dependencies along with configurations to be applied in making the environemnt ready for usage is very difficult
+
+3. Installing/configuring the software packages is an repeatitive process that should be performed on a large fleet of computers, so manually carrying such operations will leads to human errors and delays the availability of the environments in developing/testing or delivering the application
+
+4. Keeping track of what packages/configurations are applied on which means on a fleet servers is quite hard and difficult to maintain
+
+5. patching and upgrading the existing fleet servers is very difficult and might take lot of time in identifying the right servers to upgrade/patch
+
+From the above we can understand manually installing/configuring the software packages on a fleet servers across the projects/environments may leads to difficulties/challenges and might encounter failures that kills lot of time and delays the software development and delivery of the application
+
+So to overcome these above problems in installing/configuring the software packages we need software configuration management automation. Which means instead of we manually taking care of installing/configuring we need to automate the process of carrying these activities.
+    
+There are many ways we can automate the process of installing and configuring the software packages on the Infrastructure:
+-----------------------------------------------------------------------------------------------------
+#2. Shellscripting
+Instead of devops engineer manually installing and configuring the software packages on the Infrastructure, he/she can write shellscript program that has necessary instructions in installing/configuring the required packages on the given environment. The devops engineer can quickly run the shellscript program on each machine whereever it is required to install/configure.
+
+There are lot of advantages of using shell scripting over manually installing and configuring the packages as below:
+advantages:
+1. it greatly reduces the time required for installing/configuring the software packages
+2. no need to memorize once written in the form of program
+3. once written can be reused across the environments, across the projects in configuring and installing for similar type of requirements/needs
+4. we can create reproducible environments flawlessly using shellscript automation
+5. patching and upgradation of the software packages can be done quickly by writing migration/upgradation scripts
+
+Looks like shellscripting has almost solved all the problems that we went through in manually installing and configuring the software packages. But there are lot of problems in using shellscripting for achieving software configuration management automation as below.
+    
+drawbacks:
+1. Not everyone is a programmer to build shellscript programs in achieving the software configuration management automation
+2. Not portable across the operating system environments or even across the linux distro
+3. No error handling to rollback the state of the system incase of failure
+4. No logging support
+5. idempotancy is tough to achieve, because we endup in writing complex programming logic in building the shellscript program to achieve idemotancy
+idempotancy = The outcome of performing an operation for 1 or N times will not effect the state of the system.
+---------------------------------------------------------------------------------------------------------------------------------
+#3. Python
+Python is an high-level platform independent scripting language. It has rich-set of modules or reusable libraries, that can be used in quickly building software applications using python. Most of the time the programmers never needs to write programming logic from the scratch, rather they can make use of these modules/libraries in quickly building the python programs
+
+It comes with rich support of modules like: os, subprocess, shutil, psutil, fabric etc using them we can simplify the tasks of process monitoring, remote server management, administrative operations etc
+In addition it comes with rich set of features that usually exists with any high-level programming languages like:
+1. Platform portable = the code written using python programming language works across operating system platforms
+2. Rich support of exception/error handling = The programmers can write python programs in keeping in view of error handling support so that incase of failure we can execute alternate code in recovering or rollbacking the system state
+3. logging
+4. due to powerful programming constructs, its easy to achieve idempotancy while building python programs for software configuration management
+
+By considering all of these above aspects, python is being considered as most favorable language for administrative and software configuration management automation
+
+But it has its own dis-advantages too:
+1. should be a python programmer in building the software configuration management scripts
+2. no matter of what best the programming constructs are, still the programmer has to write enough programming logic in accomplishing idempotancy and still remains tough to achieve
+3. We need to endup in writing huge amount of code in achieving idempotancy and takes lot of time and cost in implementing the automation
+4. python doesnt support statement management, it doesn't keeps track of software packages / configurations being applied on what infrastructure
+5. orchestrating the code modules in achieving the automation is very complex
+
+From the above discussion, we can derive the minimal requirements in accomplishing the software configuration management automation as below:
+  1. no complex programming logic to be written in implementing the software configuration management automation
+  2. platform portable
+  3. idempotancy
+  4. logging
+  5. exception/error handling 
+  6. state management to keep track of which fleet machines are installed with what software packages and configurations of which versions
+  7. complex code orchestration should be accomplished easily
+  
+Neither the shellscripting nor the python doesnt provides such capabilities in implementing the software configuration management automation. These technologies can be used for performing small or one-time activities or actions to be applied on a Fleet of servers only.
+  
+To achieve software configuration management automation there are lot of vendors provided different tools in the market few of commercial and others are open source:
+1. Chef
+2. Puppet
+3. Ansible
+4. Saltstack
+etc
+
+These software configuration management automation tools works based on 2 architectures
+1. pull-based architecture
+2. push-based architecture
+
+1. pull-based architecture
+  1. Chef
+  2. Ansible Tower
+  
+2. pushed-based architecture
+  1. Ansible (opensource)
+  2. Ansible Tower (push/pull) (commercial)
+  3. Puppet
+  4. Saltstack
+  
+1. pull-based architecture
+--------------------------
+In the pull-based architecture there are #3 components are there
+
+1. Control Node Server
+The Control Node Server (Chef Server) holds the entire information about the Fleet servers in the organization that should be managed. The code modules are stored on the Control Node Server Repository and distributed across the Fleet inorder to execute the automation. It keeps track of which code modules are ran on which fleet servers and what is their outcome of execution
+
+2. Fleet Server
+Each Node on the Fleet is called Fleet server, on this the agent software should be installed and configured to talk to the Control Node Server. Upon pushing the code module on to the Control Node Server it stores in the repository. The agent software on these nodes of the fleet periodically polls the control node server asking for any code modules are available for execution. Downloads them onto the Nodes and executes them locally and returns the output of the execution back to the Control Node Server updating their status of execution
+
+3. Workstation
+The devops engineer has to write the code modules on the workstation computer, upon testing he has to pass the code modules for execution onto the Control Node Server through knife CLI tool. While passing the code modules has to specify when and on whom these code modules should be applied. So that Control Node Servers stores them in the repository and distributes when requested for execution.
+  
+Since the Fleet Nodes pull the code modules from the Control Node Server for execution it is called "pull-based architecture".
+  
+Let us understand the advantages/dis-advantages of the pull-based architecture:
+advantages:-
+-------------  
+1. The agent node software with in the Fleet node pulls the code module from the control node server and executes them locally because of this the load on the control node server is very less. This architecture can scale to any size of the Fleet
+2. supports parallel execution of the code modules as each agent is responsible for pulling and executing the code modules independently. hence would result in high performance too
+3. scheduled execution of the code modules are supported by this architecture
+
+dis-advantages:-
+---------------
+1. If the control node server goes down, the whole fleet would be down (single-point of failure)  
+2. Migrating the Control node server is very difficult, because we need to reconfigure all the fleet servers in the organization inorder to point to the new control node server, this is a very tedious job
+3. Since the control node server holds all the information about the fleet nodes in the organization, if it has been compromised by the intruder or hacker gains the access to all the fleets on the network
+4. on each fleet node we need to install the agent software and configure it to talk to the Control Node Server which is going to take lot of time in setting up the infrastructure
+5. The Control Node server should be pre-configured with each node information on the Fleet which is again a time consuming job in configuring and setting up
+6. keeping track of which code modules are executed on which nodes of the fleet and their status is very difficult. we need to constantly monitor the Control Node Server to know the status of an code module execution. In case of failure we need to extract the logs on that specific node of the fleet and troubleshoot to understand the failure which is a complex job
+7. troubleshooting and triaging the node connectivity issues with the control node server is very complex
+8. Delayed updates/automations: The Fleet node must initiate the pull process by themself, which might result in slower propagation of the urgent changes.
+  
+2. push-based architecture
+--------------------------
+The software configuration management tools like Ansible/Puppet/Salt stack etc works based on push-based architecture. These has to be installed on central server computer. The devops engineers writes the code modules on the local workstation and uses the central server computer software configuration management tool for executing them on the fleet servers 
+
+1. Control Node Server
+The Control Node Server on which the software configuration management tool that is running is stateless, it dont know any of the information about the fleet nodes on the organization network. It doesnt even keeps track of the information about the state of the fleet servers too like their h/w configuration or software packages installed. 
+This makes us easy in switching the control server/software configuration management server to a new computer as well.
+  
+2. The devops engineer authenticate himself with Control Node Server and passes the code modules along with group/list of servers in the inventoryFile on whom the code module should be executed
+
+3. The Control Node Server connects to each Fleet Node over SSH protocol across the network, copies the code module onto the Fleet node and executes it locally on the machine, captures the output of execution and reports back to the devops engineer
+
+since the code modules are pushed by the control node server and executed on the Fleet nodes, it is called "push-based architecture".
+  
+advantages:-
+  1. since the software configuration management tool that is running on the central server computer is stateless, we can use any other computer to act as control node server to run the automation
+  2. If the control node server has been compromised there is no problem, since it doesnt hold any of the information about the fleet nodes of the organization
+  3. Don't need to install agent software on each node of the fleet, don't need to configure/register the fleet server with the control node server thus making it quick to setup the infrastructure
+  4. on-demand execution of the code modules on the fleet servers is supported, since it is push-based mechanism
+  5. debugging the nodes of the cluster, monitoring them is very easy. Because the control node server itself connects to each node and executes the codemodules, so incase of failure in connection or execution of a codemodule on a node, we can see the error information specific to fleet node instantaneously
+  6. since it is a push-based mechanism we can define the rollout strategy of the code modules
+  
+dis-advantages:-
+  1. The architecture by itself cannot scale to handle large group of fleet servers within the organization
+  2. the more the fleet nodes are the longer it takes to execute/apply the code modules
+  3. scheduled execution of the code modules is not supported
+  
+From the above both pull and push based architectures has their own advantages and dis-advantages, which strategy or model to be choose in implementing the software configuration automation purely depends on the needs and the kind of fleet we have in our organization
+1. Large fleet of servers prefer pull-based architecture, but a one-time complexity in setting up the infrastructure will be a burden
+2. Small to moderate fleet size, we can scale and manage the code automations using push-based architecture, which is simple to setup and quick to use
+
+Note:
+-----
+1. schedules executions = pull-based architecture
+2. on-demand execution with various roll-out strategies = push-based architecture
+
+easy to setup and quick to use = push-based architecture
+-----------------------------------------------------------------------------------------------------------------------------------
+
+Ansible 
+-------
+Ansible is an software configuration management automation tool that works based on push-based architecture using which we can run code modules on the infrastructure for installing/configuring the software packages on the Fleet servers within the organization. 
+
+Ansible architecture
+--------------------
+There are 5 core components are there in Ansible
+1. Ansible modules
+2. Ansible Control Node Server [Master]
+3. Ansible Managed Nodes
+4. Ansible Playbooks
+5. Inventory File
+
+1. Ansible modules
+Ansible modules are reusable code-blocks/functions that are written in python programming language by the Ansible developers and distributed them aspart of the ansible installation. These ansible modules are pre-coded to perform a task or operation and are written to enforce the idempotancy principle.
+
+These modules takes data as input, performs the operation and returns the output of executing the task on the machine. For eg.. an apt module takes software package name as input, installs and return the output indicating the status of the execution like
+    1. installed ok (changed)
+    2. no change
+    3. failed
+
+2. Ansible Control Node Server
+The Ansible control node server is the engine of the Ansible architecture, any machine that is installed with Ansible software can be called as Ansible control node server. The Ansible control node server takes playbook/module and inventoryFile as an input, then pushes/copies these modules onto the Managed Node of the Fleet and executes each module locally on the Fleet node. Captures the output of execution back interms of JSON format and displays the outcome to the Ansible user
+    1. The ControlNode server is stateless, because of this we can use any machine which is installed with Ansible software as an Control node Server
+    2. The Control Node Server communicates with the Fleet or Managed nodes over the network through SSH protocol, so each node must and should be configured with SSH access
+    3. Ansible has provided CLI tool through which devops engineer can communicate with Ansible control node server asking to execute the playbooks or code modules
+    
+3. Ansible Managed nodes
+Ansible Managed node is a server or a computer within the organization on whom we wanted to install/configure the software packages/libraries inorder to host/deploy the software application.
+    1. on each ansible managed node we need to install openssh server and should configure key-based authentication for SSH into the machine.
+    2. Install python on each managed node (most of the Linux distributions comes with Python by default)
+    3. The Linux user across all the managed nodes should be configured with passwordless sudoers access
+
+4. Ansible Playbook
+For achieving desired state of the system, we might need to install/configure bunch of software packages and configurations on the Managed nodes of the Fleet. So that we can deploy/run the software applications
+
+We can install/configure the software packages through ansible by executing the ansible modules on each managed node of the cluster using the Control Node Server. But to achieve the desired state of the system, we might need to execute bunch of ansible modules in a specific sequence order. 
+Each module should be executed by passing the relevant data as input, gather the output of execution and might need to pass it as input to another module asking for performing the operation. This way of executing each module in specific order by taking one module output as input to another module in accomplishing the task is called "orchestration"
+    
+but running each modules in specific order and orchestrating them is very difficult and time consuming job. Instead of we manually running, the devops engineer can orchestrate these modules by declaring them aspart of the Ansible playbook.
+    
+A playbook is an YAML file in which ansible developer declares the ansbile modules that has to be executed in specific order with their inputs. Now pass this playbook as input to Ansible Control Node Server, so that it parses the playbook and executes each module in specified order on the managed nodes of the fleet to achieve desired state of the system.
+    
+5. Inventory File
+The Control Node server is stateless, it doesnt hold any of the information about the managed nodes within the ansible cluster. The ansible developer has to write an Inventory File declaring or listing all the managed nodes on whom we want to apply playbooks/ansible modules to achieve the desired state.
+    
+Now along with passing playbooks, we need to pass InventoryFile also as input to the Control Node Server asking him to execute the ansible modules on the managed nodes of the Fleet that are specified in the Inventory File.
+-----------------------------------------------------------------------------------------------------------------------------------
+How to test the ansible cluster setup?
+1. we can ssh into each of the machines from the host using below command
+~/ansible_cluster:/>vagrant ssh ansible_controlnode
+    
+2. how to ssh onto the managed nodes from control node server?
+2.1 ssh into control node server from the host: vagrant ssh ansible_controlnode    
+we can check whether the managed nodes are accessible over the network or not by using ping of each managed node as below
+ping 192.168.10.12, 192.168.10.13
+    
+we can ssh from control node server to managed nodes using
+ssh -i ~/.ssh/ansiblekey vagrant@192.168.10.12
+ssh -i ~/.ssh/ansiblekey vagrant@192.168.10.13
+    
+to verify ansible control node (ansible engine) is able to ssh and execute the ansible modules on the managed node or not we need to do the below things:
+Let us execute a ping module on each managed node to verify the connectivity
+
+#1. 
+ansible control node server by default uses id_rsa as the private keyfile under ~/.ssh/ directory to connect to the managed nodes for executing the modules/playbook. But we have created the ssh key with filename as ansiblekey (private key) | ansiblekey.pub (public key). So we need to tell the ansible control node server to use the ansiblekey as private keyfile to ssh onto the managed nodes by defining it aspart of the inventory file as below
+
+~/ansible_connect
+hosts [inventory]
+------------------
+192.168.10.12 ansible_ssh_private_key_file=~/.ssh/ansiblekey
+192.168.10.13 ansible_ssh_private_key_file=~/.ssh/ansiblekey
+    
+#2. to check whether the control node server is able to ssh and execute the ansible modules are not let us use ansible adhoc command to ping all the managed nodes as below
+
+~/ansible_connect$> ansible all -i hosts -m ping
+
+-i = inventory file passed as input
+-m = module we want to execute
+    
+The ansible controlnode server should be able to ping all the managed nodes and should return pong! response    
+----------------------------------------------------------------------------------------------------------------------------------
+Ansible Configuration
+during the time of installing the ansible on the machine, it creates a directory under /etc with name "ansible", in which it places all the ansible related configurations inside it.
+    
+Within the /etc/ansible directory, there is an central configuration file located inside it called "/etc/ansible/ansible.cfg". It is the central configuration file in which most of the ansible related settings/configurations are being placed 
+
+Note: in the latest version of ansible, it comes with default installation of configurations without the "ansible.cfg" file, but if we want to change or tweak the default configurations of the ansible we can write one ansible.cfg under the /etc/ansible/ directory explicitly.
+    
+Even we can generate the sample configuration file using:
+ansible-config init --disabled > ansible.cfg
+
+This file can be placed in several different locations as
+  1. current directory
+  2. $HOME/ansible.cfg 
+  3. /etc/ansible/ansible.cfg (global)
+
+Let us explore few of the configurations available:
+1. Ansible controlnode server ssh to the managed nodes on port no: 22 by default. if we want to change the default port using which control server connects/ssh to the managed nodes we can configure/change the property in ansible.cfg file as below
+
+remote_port=22 , change it to 2222 so that control node server ssh to the managed nodes with 2222 port.
+  
+2. ansible control node server by default runs an ansible playbook/module on the managed nodes in parallel upto 5 by default. we can modify the parallel node execution by using the property: forks
+forks=5
+    
+3. We can change the default private key file being used for ssh into managed nodes from id_rsa to a different file by using the property private_key_file as below
+
+private_key_file=~/.ssh/ansiblekey
+
+4. To run an ansible module or playbook we need to pass the inventoryFile as an input to the ansible control node server. By default ansible control node server looks for the inventory file under /etc/ansible/hosts if we dont supply one explicitly.
+we can always pass an inventoryFile explicit using -i option 
+
+we can change the default inventory file by modifying the property in ansible.cfg as below
+inventory=/etc/ansible/myhosts
+
+From the above we can understand, if we want to modify any of the configurations of ansible control server globally, we can use /etc/ansible/ansible.cfg file.
+  
+For our cluster we can specify the default configurations in : /etc/ansible/ansible.cfg
+
+[defaults]
+private_key_file=~/.ssh/ansiblekey
+----------------------------------------------------------------------------------------------------------------------------------
+How do we work with Ansible?
+refer to the pdf for details
+----------------------------------------------------------------------------------------------------------------------------------
+From the above we understood ansible uses imperative programming model in accomplishing the software configuration management automation. which means we dont have to write programming instructions, rather we define what we want to accomplish, rather how to achieve it.
+  
+The ansible developers has to write playbooks declaring or defining the modules to be executed in achieving the final or desired state of the system. These playbooks should be written in YAML language. Let us explore YAML to work with playbooks
+------------------------------------------------------------------------------------------------------------------------------------
+What are data representation standards, why do we need them?
+YAML
+YAML stands for Yet (Ain't) another markup language which means not an mark-up language. It is another text-based data representation standard used for storing and representing the data similar to XML or Json formats.
+                     
+YAML stores or represents the data in structured format attached with semantics to the data. YAML greatly relies on indentation to represent the data.
+                     
+DataTypes in YAML:
+YAML supports built-in primitive datatypes as below
+1. string
+any sequence / set of characters is consider as String. To represent a string we dont need to enclose them in double-quotes
+
+2. number
+any digits are consider as numbers
+
+3. Boolean
+true, false, TRUE, FALSE, yes, no
+
+YAML supports 2 types of data structures
+1. Mappings (Dictionaries) = is an object type data structure that holds or represents key/value pair data
+2. List (Sequences)        = holding collection of values
+
+Let us explore representing the data in YAML format
+1. XML
+<ticket>
+  <pnrno>pa939</pnrno>
+  <source>Hyderabad</source>
+  <destination>Banglore</destination>
+  <journey-dt>2025-05-30</journey-dt>
+  <reservation-class>sleeper</reservation-class>
+  <price>550</price>
+</ticket>
+
+2. Json
+{
+  "pnrno": "pa939",
+  "source": "hyderabad",
+  "destination": "banglore",
+  "journey-dt": "2025-05-30",
+  "reservation-class" : "sleeper",
+  "price": 550
+}
+                     
+3. YAML
+---
+pnrno: pa939
+source: hyderabad
+destination: banglore
+journey-dt: 2025-05-30
+reservation-class: sleeper
+price: 550
+...                     
+                     
+
+examples:
+1. XML
+<groceries>
+  <item>ground nuts</item>
+  <item>cooking oil</item>
+  <item>chilli powder</item>
+</groceries>
+
+2. JSON
+["groundnuts", "cooking oil", "chilli powder"]
+
+3. YAML
+- ground nuts
+- cooking oil
+- chilli powder
+
+#2
+<tour-package>
+  <package-name>Northern India</package-name>
+  <days>12</days>
+  <boarding-station>Hyderabad</boarding-station>
+  <itenary>
+    <day1>
+        <place>1</place>
+        <place>2</place>
+    </day1>
+  </itenary>
+  <price>3</price>
+</tour-package>
+
+YAML:
+package-name: Northern India
+days: 12
+boarding-station: Hyderabad
+itenary:
+  day
+  
+
+#3
+<person>
+  <first-name></first-name>
+  <last-name></last-name>
+  <age></age>
+  <gender></gender>
+  <address>
+    <addressLine1></addressLine1>
+    <addressLine2></addressLine2>
+    <city></city>
+    <state></state>
+    <zip></zip>
+    <country></country>
+  </address>
+</person>
+
+YAML:
+first-name: Paul
+last-name: k
+age: 25
+gender: Male
+address: 
+  addressLine1: 112, devs drive
+  addressLine2: seabolt 
+  city: Hyderabad
+  state: TG
+  zip: 8374
+  country: India
+  
+  
+#4
+XML:
+<parcel>
+  <parcel-no>p38</parcel-no>
+  <source>source1</source>
+  <destination>dest1</destination>
+  <booking-dt>2025-04-30</booking-dt>
+  <weight>394</weight>
+  <amount>494</amount>
+  <sender>
+    <sender-name>person1</sender-name>
+    <contact-no></contact-no>
+  </sender>
+  <receiver>
+    <receiver-name>person2</receiver-name>
+    <contact-no></contact-no>
+  </receiver>
+</parcel>
+                  
+YAML:
+parcel-no: p38
+source: source1
+destination: dest1
+booking-dt: 2025-04-30
+weight: 394
+amount: 494
+sender:
+  sender-name: person1
+  contact-no: 939848494
+receiver:
+  receiver-name: person2
+  contact-no: 938494
+
+#5.
+JSON:
+ticket.json                     
+{
+  "pnrNo": "p9383",
+  "source": "",
+  "destination": "",
+  "journeyDate" : "",
+  "passengers": [
+    {
+      "passengerName": "",
+      "age": 23,
+      "gender": "male",
+      "mobileNo": "",
+      "coach": "",
+      "berth": 3
+    }, 
+    {
+      "passengerName": "",
+      "age": 23,
+      "gender": "male",
+      "mobileNo": "",
+      "coach": "",
+      "berth": 3
+    }
+  ],
+  "price": 3844.3,
+  "status": "CONF"
+}
+
+YAML:
+pnrNo: p938
+source: hyderabad
+destination: banglore
+journeyDate: 2025-04-28
+passengers:
+  - passengerName: p1
+    age: 23
+    gender: male
+    mobileNo: 9393944
+    coach: S3
+    berth: 3
+  - passengerName: p2
+    age: 23
+    gender: male
+    mobileNo: 9393944
+    coach: S3
+    berth: 4
+price: 838
+status: CONF      
+
+#6.
+JSON:                     
+[
+  {
+    "playerName": "sachin",
+    "age": 39,
+    "gender": "Male",
+    "rank": 3,
+    "matchesPlayed": 39
+  },
+  {
+    "playerName": "dhoni",
+    "age": 36,
+    "gender": "Male",
+    "rank": 38,
+    "matchesPlayed": 39
+  }
+]    
+                     
+YAML:
+- playerName: sachin
+  age: 39
+  gender: male
+  rank: 3
+  matchesPlayed: 39
+- playerName: dhoni
+  age: 36
+  gender: male
+  rank: 24
+  matchesPlayed: 30                       
+----------------------------------------------------------------------------------------------------------------------------------
+                     
+What is an Ansible inventory file, how to write an ansible inventory file?
+The Ansible control node server is stateless, it does not hold any information pertaining to the managed nodes of the ansible cluster. so, inorder to apply the code automation like executing a module or playbook on the nodes of the cluster, the devops engineer has to provide the list of managed nodes on the cluster by writing inventory file
+
+The default inventory file that ansible control node server looks at is /etc/ansible/hosts file. In this file we need to declare the list of hosts/managed nodes of the cluster on whom we want to apply the modules/playbooks. The ansible control node server inorder to execute the modules/playbooks will look into this file for identifying the nodes of the cluster
+
+Instead of using default inventoryFile, we can create our own inventoryFile with list of managed nodes and pass it as an input to the control node server using -i switch while running the playbook/module as below
+
+syntax:-
+ansible [group] -i inventoryFile -m module -a args
+
+There are 2 forms of writing an inventoryFile are there
+1. INI format
+2. YAML format
+
+1. INI
+INI file is an plain text file used for configuration purposes. The name comes from "initialization" or often used for initialization settings for an software application. These files holds the information in key=value pair format
+In the hosts INI file we can declare each host/managed node in a new file as shown below
+
+$HOME/hosts
+-------------
+192.168.10.12
+192.168.10.13
+    
+ansible all -i $HOME/hosts -m ping
+
+2. YAML 
+$HOME/hosts.yml
+----------------
+all:
+  hosts:
+    192.168.10.11:
+      ansible_ssh_private_key_file: ~/.ssh/ansiblekey
+    192.168.10.12:
+      ansible_ssh_private_key_file: ~/.ssh/ansiblekey
+
+(or)
+          
+all:
+  hosts:
+    javaserver1:
+      ansible_host: 192.168.10.12
+      ansible_ssh_private_key_file: ~/.ssh/ansiblekey
+    javaserver2:
+      ansible_host: 192.168.10.13
+      ansible_ssh_private_key_file: ~/.ssh/ansiblekey
+
+ansible all -i $HOME/hosts.yml -m ping
+
+In an organization there can be lot of machines assigned to different projects, always we dont want to apply the modules or playbooks across all the servers in the organization. so instead of using default inventory file it is recommended to use project specific inventory file and pass -i switch passing the inventoryFile in executing the modules/playbooks
+-----------------------------------------------------------------------------------------------------------------------------------
+
+As per the above recommendation, for each project we need to have project specific inventory declared with managed nodes related to that project. But having an project specific inventory file may not be helpful, because all the servers alloted to the project may not be same, different managed nodes are installed with different software utilities and packages. So we need to run different code modules on different groups of nodes in the cluster
+
+To apply automation on subset of nodes, we can define groups, where we can group similar type of machines so that we can apply code automation easily.
+There are 2 default groups are there in the inventoryFile
+1. all group
+2. ungrouped
+
+1. all group = all the hosts declared in the inventoryFile are part of all group
+2. ungrouped = If there is any node/host that is not part of any group, then it is assigned to ungrouped.
+  
+How to declare groups in inventoryFile?
+$USER_HOME/hosts
+192.168.10.11
+[dbservers]  
+192.168.10.12
+192.168.10.13
+[javaservers]  
+192.168.10.14
+192.168.10.15  
+
+In the above hosts file we have 5 nodes and 4 are groups
+1. all group which has all the nodes defined in the inventory file
+2. ungrouped = we have only 1 node: 192.168.10.11
+and rest of all are part of dbservers group and javaservers group  
+
+YAML:
+
+all:
+  hosts:
+    192.168.10.12:
+      ansible_ssh_private_key_file: ~/.ssh/ansiblekey
+  children:
+    dbservers:
+      hosts:
+        192.168.10.13:
+          ansible_ssh_private_key_file: ~/.ssh/ansiblekey
+    javaservers:
+      hosts:
+        192.168.10.14:
+          ansible_ssh_private_key_file: ~/.ssh/ansiblekey
+        192.168.10.15:
+          ansible_ssh_private_key_file: ~/.ssh/ansiblekey
+----------------------------------------------------------------------------------------------------------------------------------
+Inventory File Variables
+------------------------
+Variables acts as placeholders or reserved/named memory locations in which we can store values and refer them through the variableName. By using variables we can easily maintain the program, incase if we need to change the value being used in the program we dont need to change all the places where we are using the value instead we can change the value assigned to the variable to quickly get that reflected everywhere.
+  
+We can define variables and attach to either host, group or global level within the inventoryFile.  These variables acts as input while executing playbook/module on the managed nodes of the cluster. So we can avoid hardcoding the values inside the playbook and run the playbook by passing different values from these variables.
+  
+There are 3 levels at which we can define variables in inventory file:
+1. global variables
+These are the variables that will be passed to all the modules/playbooks that are executed against the all hosts/groups defined in the inventoryFile
+  
+2. host-level variables
+These variables are defined/attached specific to the host only. So that these variables will act as input to the playbook/module while it is running on the specific host only. ideally configuration values, lables that classified the machine/usage are defined as host-level variables
+
+3. group-level variables
+Group level variables are defined for a group of hosts whose values are common for the entire group
+
+
+There are 2 types of variables are there in ansible
+1. ansible pre-defined variables
+2. custom/user-defined variables
+
+1. ansible pre-defined variables
+These variables are the ones for which ansible has attached pre-defined meaning to them. Through these variables we change the behavior of the control node server and how it has to connect to the managed nodes or how it has to execute the playbook or modules on the managed nodes of the cluster. All these pre-defined variables are prefixed with "ansible_"
+  
+1. ansible_host
+2. ansible_port
+3. ansible_user
+4. ansible_password
+5. ansible_ssh_private_key_file
+6. ansible_become
+7. ansible_become_user
+8. ansible_become_password
+9. ansible_shell_type
+
+2. user-defined variables
+In addition to the pre-defined variables we can define our own variables attached with values within the inventoryFile, so that these variables will be passed as input while executing the playbooks or modules on the nodes of the cluster
+
+How to declare these variables?
+1. INI
+1.1 host-level variables
+hosts
+-----
+192.168.10.12 variableName=value1 variableName=value2
+
+1.2 group-level variables
+[dbservers]
+192.168.10.12
+192.168.10.13
+  
+[dbservers:vars]
+variableName=value
+variableName=value
+
+1.3 global variables
+[all:vars]
+variable1=value1
+variable2=value2
+
+2. YAML
+1. global, host-level & group-level variables
+
+all:
+  hosts:
+    192.168.10.12:
+      variableName=value
+      variableName=value
+  vars:
+    variableName=value
+  children:
+    dbservers:
+      hosts:
+        192.168.10.13:
+          variableName:value
+      vars:
+        variableName=value
+        variableName=value
+----------------------------------------------------------------------------------------------------------------------------   
+Ansible host aliases
+--------------------
+In addition to the host addresses/ip addresses, we can assign an alias name to each host defined in the inventory file, that makes it more readable and easy to debug.
+          
+hosts
+-----
+dbServer ansible_host=192.168.10.12
+javaServer ansible_host=192.168.10.13
+          
+           
+debug module:
+To explore the variables in inventory file we can use debug module for printing the variable values while executing on the ansible nodes. its similar to echo command.
+
+ansible all -m debug -a "msg='good morning'"
+
+hosts
+------
+[all:vars]
+project_name=netsecure_banking
+
+
+[all]
+javaServer1 ansible_host=192.168.10.12 ansible_ssh_private_key_file=~/.ssh/ansiblekey software_version=java17
+
+[dbServers]
+dbServer1 ansible_host=192.168.10.13 ansible_ssh_private_key_file=~/.ssh/ansiblekey software_version=mysql8
+dbServer2 ansible_host=192.168.10.14 ansible_ssh_private_key_file=~/.ssh/ansiblekey
+
+[dbServers:vars]
+software_version=oracle19c  
+ansible all -i hosts -m debug -a "msg='software version: {{ software_version }} , project: {{ project_name }}'"
+  
+
+hosts.yml
+---
+all:
+  hosts:
+    javaServer1:
+      ansible_host: 192.168.10.12
+      software_version: jdk17
+  vars:
+    project_name: netbanking
+  children:
+    dbServers:
+      hosts:
+        dbServer1:
+          ansible_host: 192.168.10.13
+          software_version: mysql18
+        dbServer2:
+          ansible_host: 192.168.10.14
+      vars:
+        software_version: oracle19c
+...
+-----------------------------------------------------------------------------------------------------------------------------
+Host Ranges
+-----------
+In an organization we might have lot of hosts with similar host patterns either with a specific naming convention or ip address range. To avoid adding each host in the inventoryFile manually we can use host patterns/ranges
+
+For eg.. we have java servers starting for ip address: 192.168.10.12 to 192.168.10.25. Instead of defining 14 managed nodes with same duplicate configuration defined in the inventory file we can make use host ranges as below
+
+hosts
+------
+[javaServers]
+javaServers[1:13:1] 192.168.10.[12:25:1] ansible_ssh_private_key_file=~/.ssh/ansiblekey
+
+hosts.yml
+---
+all:
+  hosts:
+    192.168.10.[12:25:1]:
+      ansible_ssh_private_key_file=~/.ssh/ansiblekey
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

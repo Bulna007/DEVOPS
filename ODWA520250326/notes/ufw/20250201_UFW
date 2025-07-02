@@ -52,37 +52,3 @@ sudo apt install -y openjdk-17-jdk
 
 To verify java installation run the below command
 java -version
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
